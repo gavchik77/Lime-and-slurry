@@ -305,11 +305,6 @@ function checkPracticeLive(){
   }
 }
 
-$("openPractice").addEventListener("click",()=>{
-  show("practice");
-  if(!practiceData)generatePractice();
-  $("practice").scrollIntoView({behavior:"smooth",block:"start"});
-});
 $("newPractice").addEventListener("click",generatePractice);
 
 ["pArea40","pArea15","pArea30","pWeightedN","pTotalN","pSlurryUsed","pSlurryRemaining","pLimeRate","pLimeTotal"].forEach(id=>{
@@ -330,7 +325,24 @@ const labels={
 function emptyScores(){
   const o={}; Object.keys(labels).forEach(k=>o[k]={attempts:0,success:0,fail:0,best:0,completed:false}); return o;
 }
-function loadScores(){try{return {...emptyScores(),...JSON.parse(localStorage.getItem(SCORE_KEY)||"{}")};}catch(e){return emptyScores();}}
+
+function normalizeScores(raw){
+  const base=emptyScores();
+  Object.keys(base).forEach(k=>{
+    if(raw && raw[k]){
+      base[k]={
+        attempts:Number(raw[k].attempts)||0,
+        success:Number(raw[k].success)||0,
+        fail:Number(raw[k].fail)||0,
+        best:Number(raw[k].best)||0,
+        completed:Boolean(raw[k].completed)
+      };
+    }
+  });
+  return base;
+}
+
+function loadScores(){try{return normalizeScores(JSON.parse(localStorage.getItem(SCORE_KEY)||"{}"));}catch(e){return emptyScores();}}
 let scores=loadScores();
 function saveScores(){localStorage.setItem(SCORE_KEY,JSON.stringify(scores));}
 
@@ -384,7 +396,8 @@ function recordAttempt(key){
   if(!arr){alert("Complete all answers in this lesson before marking.");return;}
   const correct=arr.filter(Boolean).length,total=arr.length,pct=Math.round(correct/total*100),success=correct===total;
   const s=scores[key]; s.attempts++; if(success){s.success++;s.completed=true;}else{s.fail++;} s.best=Math.max(s.best,pct);
-  saveScores(); renderScores();
+  saveScores(); generatePractice();
+renderScores();
   alert(success?`Marked: ${pct}% — successful.`:`Marked: ${pct}% — ${correct} of ${total} parts correct. Try again.`);
 }
 function renderScores(){

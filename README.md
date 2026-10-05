@@ -1,4 +1,4 @@
-# Lime, Slurry & Fertiliser Farm Planner v2
+# Lime, Slurry & Fertiliser Farm Planner v3
 
 A GitHub Pages-ready training app for students, built as one simplified **well-drained dairy-farm case**.
 
@@ -89,6 +89,25 @@ It also advises that grass takes up about 2.5 kg N/ha/day and that N should be a
 
 For Index-3 P and K soils, Teagasc guidance treats about 33 m³/ha of good-quality 6% DM cattle slurry as approximately sufficient for first-cut silage P and K. The exercise then balances the remaining N with a protected urea + S product assumed at 38% N.
 
+
+
+## Version 3 visibility fix
+
+The **Practice Generator is now visible immediately** and no longer requires completion of Lessons 1–6 before it appears.
+
+The score dashboard should always show **7 rows**:
+
+1. Lime requirement
+2. Lime/slurry timing
+3. Well-drained spring N plan
+4. Slurry inventory
+5. First-cut silage
+6. Silage timing
+7. Practice generator
+
+A practice case is generated automatically when the page loads.
+
+The page header also displays **Version 3** so it is easy to confirm that the newest files are being served by GitHub Pages.
 
 ## Weighted-average explanation
 
