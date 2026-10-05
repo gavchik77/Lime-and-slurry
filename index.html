@@ -31,7 +31,7 @@
       <div><span>Attempts</span><strong id="scoreAttempts">0</strong></div>
       <div><span>Successful</span><strong id="scoreSuccess">0</strong></div>
       <div><span>Unsuccessful</span><strong id="scoreFail">0</strong></div>
-      <div><span>Lessons completed</span><strong id="scoreCompleted">0 / 6</strong></div>
+      <div><span>Lessons completed</span><strong id="scoreCompleted">0 / 7</strong></div>
     </div>
 
     <div class="table-wrap">
@@ -206,6 +206,27 @@
       </label>
     </div>
 
+    <details class="teaching-note" open>
+      <summary>What does “weighted average total N” mean?</summary>
+      <p>
+        Different parts of the grazing platform receive different total N rates by 1 April.
+        Because those parts are different sizes, you should not simply add the four N rates and divide by four.
+      </p>
+      <p>
+        Instead, multiply each N rate by the number of hectares receiving it, add all of the kg N applied,
+        then divide by the whole grazing-platform area.
+      </p>
+      <div class="formula">
+        Weighted average N =
+        [(12.8 × 70) + (4.8 × 75) + (4.8 × 83) + (9.6 × 79)] ÷ 32
+        = 75.4 kg N/ha
+      </div>
+      <p class="small">
+        This tells you the average N application per hectare across the entire 32 ha grazing platform,
+        while still allowing each part of the platform to receive a different N rate.
+      </p>
+    </details>
+
     <div id="springFeedback" class="feedback neutral">Calculate the areas first, then the weighted N total.</div>
     <div class="actions"><button id="markLesson3">Mark this attempt</button></div>
   </section>
@@ -332,6 +353,82 @@
       This case is deliberately simplified. Real farm plans must use current soil tests, actual slurry analysis/DM, crop requirements,
       stocking-rate/legal nutrient allowances, weather/trafficability and current regulations.
     </p>
+    <div class="actions">
+      <button id="openPractice">Open practice generator</button>
+    </div>
+  </section>
+
+
+  <section class="card hidden" id="practice">
+    <p class="stepno">Practice generator</p>
+    <h2>Try a new well-drained farm case</h2>
+    <p>
+      The app changes the farm size, slurry inventory and lime-test result, but keeps the same
+      <strong>well-drained 40% / 15% / 15% / 30%</strong> spring programme and the same Teagasc-based rules used above.
+    </p>
+
+    <div class="actions">
+      <button id="newPractice">Generate new case</button>
+    </div>
+
+    <div id="practiceCase" class="scenario-box"></div>
+
+    <h3>A. Spring grazing-platform calculation</h3>
+    <div class="question-grid four">
+      <label>1st 40% area (ha)
+        <input id="pArea40" type="number" step="0.1">
+        <span class="field-feedback" id="pArea40Fb"></span>
+      </label>
+      <label>Each 15% area (ha)
+        <input id="pArea15" type="number" step="0.1">
+        <span class="field-feedback" id="pArea15Fb"></span>
+      </label>
+      <label>Final 30% area (ha)
+        <input id="pArea30" type="number" step="0.1">
+        <span class="field-feedback" id="pArea30Fb"></span>
+      </label>
+      <label>Weighted average N by 1 April (kg N/ha)
+        <input id="pWeightedN" type="number" step="0.1">
+        <span class="field-feedback" id="pWeightedNFb"></span>
+      </label>
+    </div>
+
+    <div class="question-grid">
+      <label>Total N across grazing platform by 1 April (kg N)
+        <input id="pTotalN" type="number" step="1">
+        <span class="field-feedback" id="pTotalNFb"></span>
+      </label>
+      <label>Early-spring slurry used (m³)
+        <input id="pSlurryUsed" type="number" step="0.1">
+        <span class="field-feedback" id="pSlurryUsedFb"></span>
+      </label>
+      <label>Slurry remaining (m³)
+        <input id="pSlurryRemaining" type="number" step="0.1">
+        <span class="field-feedback" id="pSlurryRemainingFb"></span>
+      </label>
+    </div>
+
+    <h3>B. Lime calculation</h3>
+    <div class="formula">
+      Lime requirement (t/ha) = (6.7 − measured SMP pH) × 12.5
+    </div>
+    <div class="question-grid">
+      <label>Lime rate (t/ha)
+        <input id="pLimeRate" type="number" step="0.01">
+        <span class="field-feedback" id="pLimeRateFb"></span>
+      </label>
+      <label>Total lime for the practice block (t)
+        <input id="pLimeTotal" type="number" step="0.1">
+        <span class="field-feedback" id="pLimeTotalFb"></span>
+      </label>
+    </div>
+
+    <div id="practiceFeedback" class="feedback neutral">
+      Complete the generated case, then press “Mark this attempt”.
+    </div>
+    <div class="actions">
+      <button id="markPractice">Mark this attempt</button>
+    </div>
   </section>
 
   <section class="card source-card">

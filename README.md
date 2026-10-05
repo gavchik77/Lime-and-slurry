@@ -1,4 +1,4 @@
-# Lime, Slurry & Fertiliser Farm Planner
+# Lime, Slurry & Fertiliser Farm Planner v2
 
 A GitHub Pages-ready training app for students, built as one simplified **well-drained dairy-farm case**.
 
@@ -88,6 +88,54 @@ The supplied 2025 teaching material uses a 5 t DM/ha crop requiring:
 It also advises that grass takes up about 2.5 kg N/ha/day and that N should be applied at least six weeks before cutting.
 
 For Index-3 P and K soils, Teagasc guidance treats about 33 m³/ha of good-quality 6% DM cattle slurry as approximately sufficient for first-cut silage P and K. The exercise then balances the remaining N with a protected urea + S product assumed at 38% N.
+
+
+## Weighted-average explanation
+
+The app now explains the phrase **"Weighted average total N by 1 April"** directly below the question.
+
+For the 32 ha grazing platform:
+
+```text
+(12.8 ha × 70 kg N/ha)
++ (4.8 ha × 75 kg N/ha)
++ (4.8 ha × 83 kg N/ha)
++ (9.6 ha × 79 kg N/ha)
+= 2,412.8 kg N
+```
+
+Then:
+
+```text
+2,412.8 kg N / 32 ha = 75.4 kg N/ha
+```
+
+The weighting is necessary because the four N rates apply to different proportions of the grazing platform.
+
+## Practice generator
+
+After completing the fixed farm case, students can generate new well-drained practice cases.
+
+The generator varies:
+
+- grazing-platform area;
+- measured slurry inventory;
+- lime-block area;
+- SMP pH.
+
+Students then calculate:
+
+- 40%, 15% and 30% grazing areas;
+- weighted average N by 1 April;
+- total N across the grazing platform;
+- early-spring slurry requirement;
+- slurry remaining;
+- lime rate;
+- total lime tonnage.
+
+The practice generator uses the same 2025 well-drained-farm spring-N rules and the same lime formula as the fixed teaching case.
+
+Practice attempts are included in the score table.
 
 ## Scoring
 

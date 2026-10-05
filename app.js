@@ -214,6 +214,108 @@ function checkSilageTiming(){
 }
 ["sixWeeksDays","uptake40","latestDay"].forEach(id=>$(id).addEventListener("input",checkSilageTiming));
 
+
+
+// ---------- practice generator ----------
+let practiceData=null;
+
+function pick(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function generatePractice(){
+  const grazingHa=pick([24,28,32,36,40]);
+  const slurryStore=pick([900,1000,1100,1200,1300]);
+  const limeBlockHa=pick([4,5,6,8]);
+  const smp=pick([6.1,6.2,6.3]);
+
+  const a40=grazingHa*.40;
+  const a15=grazingHa*.15;
+  const a30=grazingHa*.30;
+
+  const weightedN=(a40*70 + a15*75 + a15*83 + a30*79)/grazingHa;
+  const totalN=weightedN*grazingHa;
+
+  const slurry40=slurryM3(a40,2000);
+  const slurry15s=2*slurryM3(a15,2500);
+  const slurryUsed=slurry40+slurry15s;
+  const slurryRemaining=slurryStore-slurryUsed;
+
+  const limeRate=(6.7-smp)*12.5;
+  const limeTotal=limeRate*limeBlockHa;
+
+  practiceData={
+    grazingHa, slurryStore, limeBlockHa, smp,
+    a40,a15,a30,weightedN,totalN,slurryUsed,slurryRemaining,limeRate,limeTotal
+  };
+
+  $("practiceCase").innerHTML=`
+    <p><strong>Grazing platform:</strong> ${grazingHa} ha</p>
+    <p><strong>Measured cattle-slurry inventory:</strong> ${slurryStore} m³</p>
+    <p><strong>Lime block:</strong> ${limeBlockHa} ha, measured SMP pH ${smp.toFixed(1)}</p>
+    <p><strong>Spring programme:</strong> use the same 40% / 15% / 15% / 30% well-drained strategy.</p>
+  `;
+
+  ["pArea40","pArea15","pArea30","pWeightedN","pTotalN","pSlurryUsed","pSlurryRemaining","pLimeRate","pLimeTotal"].forEach(id=>{
+    $(id).value="";
+    $(id).classList.remove("good","bad");
+  });
+  ["pArea40Fb","pArea15Fb","pArea30Fb","pWeightedNFb","pTotalNFb","pSlurryUsedFb","pSlurryRemainingFb","pLimeRateFb","pLimeTotalFb"].forEach(id=>{
+    $(id).textContent="";
+    $(id).className="field-feedback";
+  });
+  setFeedback("practiceFeedback","neutral","Complete the generated case, then press “Mark this attempt”.");
+}
+
+function checkPracticeLive(){
+  if(!practiceData)return;
+  const p=practiceData;
+
+  mark("pArea40","pArea40Fb",close(val("pArea40"),p.a40,.06));
+  mark("pArea15","pArea15Fb",close(val("pArea15"),p.a15,.06));
+  mark("pArea30","pArea30Fb",close(val("pArea30"),p.a30,.06));
+  mark("pWeightedN","pWeightedNFb",close(val("pWeightedN"),p.weightedN,.08));
+  mark("pTotalN","pTotalNFb",close(val("pTotalN"),p.totalN,3));
+  mark("pSlurryUsed","pSlurryUsedFb",close(val("pSlurryUsed"),p.slurryUsed,1.0));
+  mark("pSlurryRemaining","pSlurryRemainingFb",close(val("pSlurryRemaining"),p.slurryRemaining,1.0));
+  mark("pLimeRate","pLimeRateFb",close(val("pLimeRate"),p.limeRate,.03));
+  mark("pLimeTotal","pLimeTotalFb",close(val("pLimeTotal"),p.limeTotal,.2));
+
+  const ids=["pArea40","pArea15","pArea30","pWeightedN","pTotalN","pSlurryUsed","pSlurryRemaining","pLimeRate","pLimeTotal"];
+  if(ids.every(id=>Number.isFinite(val(id)))){
+    const arr=[
+      close(val("pArea40"),p.a40,.06),
+      close(val("pArea15"),p.a15,.06),
+      close(val("pArea30"),p.a30,.06),
+      close(val("pWeightedN"),p.weightedN,.08),
+      close(val("pTotalN"),p.totalN,3),
+      close(val("pSlurryUsed"),p.slurryUsed,1.0),
+      close(val("pSlurryRemaining"),p.slurryRemaining,1.0),
+      close(val("pLimeRate"),p.limeRate,.03),
+      close(val("pLimeTotal"),p.limeTotal,.2)
+    ];
+    const correct=arr.filter(Boolean).length;
+    setFeedback(
+      "practiceFeedback",
+      correct===arr.length?"pass":"warn",
+      correct===arr.length
+        ? "All calculations are correct. Record the attempt when you are ready."
+        : `${correct} of ${arr.length} parts are currently correct.`
+    );
+  }
+}
+
+$("openPractice").addEventListener("click",()=>{
+  show("practice");
+  if(!practiceData)generatePractice();
+  $("practice").scrollIntoView({behavior:"smooth",block:"start"});
+});
+$("newPractice").addEventListener("click",generatePractice);
+
+["pArea40","pArea15","pArea30","pWeightedN","pTotalN","pSlurryUsed","pSlurryRemaining","pLimeRate","pLimeTotal"].forEach(id=>{
+  $(id).addEventListener("input",checkPracticeLive);
+});
+
 // ---------- scoring ----------
 const SCORE_KEY="limeFertiliserTutorScoresV1";
 const labels={
@@ -222,7 +324,8 @@ const labels={
   lesson3:"3 · Well-drained spring N plan",
   lesson4:"4 · Slurry inventory",
   lesson5:"5 · First-cut silage",
-  lesson6:"6 · Silage timing"
+  lesson6:"6 · Silage timing",
+  practice:"Practice generator"
 };
 function emptyScores(){
   const o={}; Object.keys(labels).forEach(k=>o[k]={attempts:0,success:0,fail:0,best:0,completed:false}); return o;
@@ -257,6 +360,23 @@ function resultFor(key){
     const ids=["sixWeeksDays","uptake40","latestDay"]; if(ids.some(id=>!Number.isFinite(val(id))))return null;
     return [close(val("sixWeeksDays"),42,.1),close(val("uptake40"),100,.1),close(val("latestDay"),8,.1)];
   }
+  if(key==="practice"){
+    if(!practiceData)return null;
+    const ids=["pArea40","pArea15","pArea30","pWeightedN","pTotalN","pSlurryUsed","pSlurryRemaining","pLimeRate","pLimeTotal"];
+    if(ids.some(id=>!Number.isFinite(val(id))))return null;
+    const p=practiceData;
+    return [
+      close(val("pArea40"),p.a40,.06),
+      close(val("pArea15"),p.a15,.06),
+      close(val("pArea30"),p.a30,.06),
+      close(val("pWeightedN"),p.weightedN,.08),
+      close(val("pTotalN"),p.totalN,3),
+      close(val("pSlurryUsed"),p.slurryUsed,1.0),
+      close(val("pSlurryRemaining"),p.slurryRemaining,1.0),
+      close(val("pLimeRate"),p.limeRate,.03),
+      close(val("pLimeTotal"),p.limeTotal,.2)
+    ];
+  }
   return null;
 }
 function recordAttempt(key){
@@ -276,9 +396,10 @@ function renderScores(){
     tr.innerHTML=`<td>${labels[k]}</td><td>${s.attempts}</td><td>${s.success}</td><td>${s.fail}</td><td>${s.attempts?s.best+"%":"—"}</td><td><span class="status-pill ${s.completed?"complete":"incomplete"}">${s.completed?"Completed":"Not completed"}</span></td>`;
     tbody.appendChild(tr);
   });
-  $("scoreAttempts").textContent=attempts;$("scoreSuccess").textContent=success;$("scoreFail").textContent=fail;$("scoreCompleted").textContent=`${completed} / 6`;$("overallScore").textContent=`${attempts?Math.round(success/attempts*100):0}%`;
+  $("scoreAttempts").textContent=attempts;$("scoreSuccess").textContent=success;$("scoreFail").textContent=fail;$("scoreCompleted").textContent=`${completed} / 7`;$("overallScore").textContent=`${attempts?Math.round(success/attempts*100):0}%`;
 }
 ["1","2","3","4","5","6"].forEach(n=>$( "markLesson"+n ).addEventListener("click",()=>recordAttempt("lesson"+n)));
+$("markPractice").addEventListener("click",()=>recordAttempt("practice"));
 $("resetScores").addEventListener("click",()=>{if(confirm("Reset all marks on this browser?")){scores=emptyScores();saveScores();renderScores();}});
 $("downloadScores").addEventListener("click",()=>{
   const rows=[["Exercise","Attempts","Successful","Unsuccessful","Best","Completed"]];

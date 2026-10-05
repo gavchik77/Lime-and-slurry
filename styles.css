@@ -70,3 +70,28 @@ input.bad{border-color:var(--red);background:#fffafa}
 @media(max-width:650px){
   .score-summary,.rule-grid,.question-grid,.question-grid.three,.question-grid.four,.case-grid,.silage-rules,.choices{grid-template-columns:1fr}
 }
+
+.teaching-note{
+  margin:14px 0;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px 14px;
+  background:#fbfcfb;
+}
+.teaching-note summary{
+  cursor:pointer;
+  font-weight:800;
+}
+.teaching-note .formula{
+  margin-bottom:8px;
+}
+.scenario-box{
+  background:#f7faf7;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 17px;
+  margin:15px 0;
+}
+.scenario-box p{
+  margin:.35rem 0;
+}
