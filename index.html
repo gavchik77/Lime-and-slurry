@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lime, Slurry & Fertiliser Farm Planner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Guided farm nutrient-planning exercise</p>
+    <h1>Lime, Slurry & Fertiliser Farm Planner</h1>
+    <p>One simplified well-drained dairy-farm case. Students decide what to apply, where, when and how much — then record their marks.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="card score-card">
+    <div class="score-heading">
+      <div>
+        <p class="stepno">Student marks</p>
+        <h2>Progress & attempt record</h2>
+        <p class="small">Fields give live feedback. Press <strong>Mark this attempt</strong> to record an attempt, so ordinary typing is not counted as repeated failure.</p>
+      </div>
+      <div class="score-total"><span>Overall score</span><strong id="overallScore">0%</strong></div>
+    </div>
+
+    <div class="score-summary">
+      <div><span>Attempts</span><strong id="scoreAttempts">0</strong></div>
+      <div><span>Successful</span><strong id="scoreSuccess">0</strong></div>
+      <div><span>Unsuccessful</span><strong id="scoreFail">0</strong></div>
+      <div><span>Lessons completed</span><strong id="scoreCompleted">0 / 6</strong></div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="scoreTable">
+        <thead><tr><th>Exercise</th><th>Attempts</th><th>Successful</th><th>Unsuccessful</th><th>Best</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button id="resetScores" class="secondary">Reset marks</button>
+      <button id="downloadScores" class="secondary">Download marks CSV</button>
+    </div>
+    <p class="small">Scores stay in this browser only. Students can screenshot this table or download the CSV.</p>
+  </section>
+
+  <section class="card case-card">
+    <p class="stepno">The farm case</p>
+    <h2>Well-drained mineral-soil dairy farm</h2>
+
+    <div class="case-grid">
+      <div><span>Total farm</span><strong>40 ha</strong></div>
+      <div><span>Grazing platform</span><strong>32 ha</strong></div>
+      <div><span>1st-cut silage</span><strong>8 ha</strong></div>
+      <div><span>Stock</span><strong>80 dairy cows</strong></div>
+      <div><span>Slurry available</span><strong>1,000 m³</strong></div>
+      <div><span>Slurry</span><strong>Cattle, ~6% DM, LESS</strong></div>
+    </div>
+
+    <p>
+      The slurry store has been measured, so use the <strong>1,000 m³ actual inventory</strong> rather than estimating slurry quantity from cow numbers.
+      The grazing-platform spring plan uses the Teagasc <strong>well-drained</strong> 40% / 15% / 15% / 30% split.
+    </p>
+
+    <h3>Soil-test information</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Block</th><th>Area</th><th>Use</th><th>Soil</th><th>pH / SMP pH</th><th>P</th><th>K</th></tr></thead>
+        <tbody>
+          <tr class="focus-row"><td>Lime block</td><td>8 ha</td><td>Grazing, low spring cover</td><td>Mineral, grass-only</td><td>pH 5.7 / SMP 6.2</td><td>Index 2</td><td>Index 2</td></tr>
+          <tr><td>Other grazing</td><td>24 ha</td><td>Grazing</td><td>Mineral</td><td>pH ≥ 6.3</td><td>Index 3</td><td>Index 3</td></tr>
+          <tr><td>Silage block</td><td>8 ha</td><td>1st-cut, 5 t DM/ha</td><td>Mineral</td><td>pH 6.3</td><td>Index 3</td><td>Index 3</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="small">
+      Simplification: this is a nutrient-planning teaching case, not a full regulatory nutrient-management plan.
+      Chemical-N legal allowances are assumed to have been checked separately.
+    </p>
+  </section>
+
+  <section class="card">
+    <p class="stepno">Reference rules used in this exercise</p>
+    <h2>Teagasc-based rules</h2>
+    <div class="rule-grid">
+      <div><b>Lime</b><span>Grassland mineral-soil target pH ≈ 6.3. Laboratory lime requirement uses SMP/buffer pH.</span></div>
+      <div><b>Lime formula</b><span>LR (t/ha) = (target SMP pH 6.7 − measured SMP pH) × 12.5.</span></div>
+      <div><b>Single lime application</b><span>Do not exceed 7.5 t/ha in one application.</span></div>
+      <div><b>Lime + slurry</b><span>Slurry first → wait about 7 days → lime. Lime first → wait 3 months before slurry. No interval is required with protected urea.</span></div>
+      <div><b>Spring N</b><span>Use the 2025 well-drained-farm 40/15/15/30 grazing-area strategy.</span></div>
+      <div><b>1st-cut silage</b><span>5 t DM/ha crop: 100 kg N/ha in this exercise; apply N at least 6 weeks before cutting.</span></div>
+    </div>
+  </section>
+
+  <section class="card" id="lesson1">
+    <p class="stepno">Lesson 1 · Start with soil</p>
+    <h2>What should you examine first?</h2>
+    <div class="choices">
+      <button data-first="price">Fertiliser price</button>
+      <button data-first="ph">Soil-test pH and lime requirement</button>
+      <button data-first="urea">Protected urea rate</button>
+      <button data-first="bags">Number of fertiliser bags</button>
+    </div>
+    <div id="firstFeedback" class="feedback neutral">Choose the first step in the farm nutrient plan.</div>
+
+    <div id="limeCalc" class="hidden nested">
+      <h3>Calculate lime for the 8 ha lime block</h3>
+      <div class="formula">
+        Lime requirement (t/ha) = (6.7 − SMP pH 6.2) × 12.5
+      </div>
+      <div class="question-grid three">
+        <label>Lime requirement (t/ha)
+          <input id="limeRate" type="number" step="0.01">
+          <span class="field-feedback" id="limeRateFb"></span>
+        </label>
+        <label>Total lime for 8 ha (t)
+          <input id="limeTotal" type="number" step="0.1">
+          <span class="field-feedback" id="limeTotalFb"></span>
+        </label>
+        <label>Can it be applied in one application? (1 = yes, 0 = no)
+          <input id="limeOnePass" type="number" min="0" max="1" step="1">
+          <span class="field-feedback" id="limeOnePassFb"></span>
+        </label>
+      </div>
+      <div id="limeFeedback" class="feedback neutral">Calculate the rate, total tonnage and compare the rate with 7.5 t/ha.</div>
+      <div class="actions"><button id="markLesson1">Mark this attempt</button></div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="lesson2">
+    <p class="stepno">Lesson 2 · Lime timing</p>
+    <h2>This low-pH block also needs early slurry. What order is sensible?</h2>
+
+    <div class="choices" id="timingChoices">
+      <button data-timing="limefirst">Lime first, then slurry next week</button>
+      <button data-timing="slurryfirst">Slurry first, then lime about 7 days later</button>
+      <button data-timing="same">Apply slurry and lime together</button>
+      <button data-timing="skip">Skip lime completely</button>
+    </div>
+    <div id="timingFeedback" class="feedback neutral">Choose the correct sequence.</div>
+
+    <div class="question-grid">
+      <label>If lime is applied first, how long before slurry? (months)
+        <input id="monthsAfterLime" type="number" step="0.1">
+        <span class="field-feedback" id="monthsAfterLimeFb"></span>
+      </label>
+      <label>Protected urea after lime: required waiting interval (days)
+        <input id="protectedWait" type="number" step="1">
+        <span class="field-feedback" id="protectedWaitFb"></span>
+      </label>
+    </div>
+
+    <div class="actions"><button id="markLesson2">Mark this attempt</button></div>
+  </section>
+
+  <section class="card hidden" id="lesson3">
+    <p class="stepno">Lesson 3 · Early spring grazing plan</p>
+    <h2>Split the 32 ha grazing platform</h2>
+    <p>For teaching, apply the 2025 well-drained 40% / 15% / 15% / 30% strategy to the 32 ha grazing platform.</p>
+
+    <div class="question-grid four">
+      <label>1st 40% area (ha)
+        <input id="area40" type="number" step="0.1">
+        <span class="field-feedback" id="area40Fb"></span>
+      </label>
+      <label>1st 15% area (ha)
+        <input id="area15a" type="number" step="0.1">
+        <span class="field-feedback" id="area15aFb"></span>
+      </label>
+      <label>2nd 15% area (ha)
+        <input id="area15b" type="number" step="0.1">
+        <span class="field-feedback" id="area15bFb"></span>
+      </label>
+      <label>Final 30% area (ha)
+        <input id="area30" type="number" step="0.1">
+        <span class="field-feedback" id="area30Fb"></span>
+      </label>
+    </div>
+
+    <h3>Match the spring N programme</h3>
+    <div class="schedule-table table-wrap">
+      <table>
+        <thead><tr><th>Area</th><th>January/February</th><th>February</th><th>March</th><th>Total N by 1 April</th></tr></thead>
+        <tbody>
+          <tr><td>1st 40%</td><td>2,000 gal/ac cattle slurry</td><td>—</td><td>50 kg N/ha protected urea</td><td>70 kg N/ha</td></tr>
+          <tr><td>1st 15%</td><td>—</td><td>2,500 gal/ac slurry after grazing</td><td>50 kg N/ha protected urea</td><td>75 kg N/ha</td></tr>
+          <tr><td>2nd 15%</td><td>—</td><td>29 kg N/ha protected urea + 2,500 gal/ac slurry after grazing</td><td>29 kg N/ha protected urea</td><td>83 kg N/ha</td></tr>
+          <tr><td>Final 30%</td><td>—</td><td>29 kg N/ha protected urea</td><td>50 kg N/ha protected urea</td><td>79 kg N/ha</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="question-grid">
+      <label>Weighted average total N by 1 April (kg N/ha)
+        <input id="avgSpringN" type="number" step="0.1">
+        <span class="field-feedback" id="avgSpringNFb"></span>
+      </label>
+      <label>Total grazing-platform N by 1 April (kg N)
+        <input id="totalSpringN" type="number" step="1">
+        <span class="field-feedback" id="totalSpringNFb"></span>
+      </label>
+    </div>
+
+    <div id="springFeedback" class="feedback neutral">Calculate the areas first, then the weighted N total.</div>
+    <div class="actions"><button id="markLesson3">Mark this attempt</button></div>
+  </section>
+
+  <section class="card hidden" id="lesson4">
+    <p class="stepno">Lesson 4 · Slurry inventory</p>
+    <h2>How much of the 1,000 m³ slurry store is used in early spring?</h2>
+
+    <p class="small">
+      For volume conversion use 1 ha = 2.471 acres and 1 imperial gallon = 4.546 L.
+      The source gives 2,000 and 2,500 gal/ac application rates.
+    </p>
+
+    <div class="formula">
+      m³ slurry = area (ha) × 2.471 × gallons/acre × 4.546 ÷ 1000
+    </div>
+
+    <div class="question-grid three">
+      <label>Slurry on 1st 40% (m³)
+        <input id="slurry40" type="number" step="0.1">
+        <span class="field-feedback" id="slurry40Fb"></span>
+      </label>
+      <label>Slurry on both 15% blocks combined (m³)
+        <input id="slurry15s" type="number" step="0.1">
+        <span class="field-feedback" id="slurry15sFb"></span>
+      </label>
+      <label>Total early-spring slurry (m³)
+        <input id="slurrySpringTotal" type="number" step="0.1">
+        <span class="field-feedback" id="slurrySpringTotalFb"></span>
+      </label>
+      <label>Slurry remaining from 1,000 m³ (m³)
+        <input id="slurryRemaining" type="number" step="0.1">
+        <span class="field-feedback" id="slurryRemainingFb"></span>
+      </label>
+    </div>
+
+    <div id="slurryFeedback" class="feedback neutral">Use the actual farm area and application rates.</div>
+    <div class="actions"><button id="markLesson4">Mark this attempt</button></div>
+  </section>
+
+  <section class="card hidden" id="lesson5">
+    <p class="stepno">Lesson 5 · First-cut silage</p>
+    <h2>Prioritise slurry to the 8 ha silage block</h2>
+
+    <p>
+      The silage block is P Index 3 and K Index 3, with a target yield of <strong>5 t DM/ha</strong>.
+      Use <strong>33 m³/ha (about 3,000 gal/ac)</strong> cattle slurry by LESS.
+    </p>
+
+    <div class="silage-rules">
+      <div><span>Crop N requirement</span><strong>100 kg N/ha</strong></div>
+      <div><span>P requirement</span><strong>20 kg P/ha</strong></div>
+      <div><span>K requirement</span><strong>125 kg K/ha</strong></div>
+      <div><span>Slurry value / m³</span><strong>1.0 N · 0.5 P · 3.5 K kg</strong></div>
+    </div>
+
+    <div class="question-grid three">
+      <label>Slurry needed for 8 ha (m³)
+        <input id="silageSlurry" type="number" step="0.1">
+        <span class="field-feedback" id="silageSlurryFb"></span>
+      </label>
+      <label>N supplied by slurry (kg N/ha)
+        <input id="silageSlurryN" type="number" step="0.1">
+        <span class="field-feedback" id="silageSlurryNFb"></span>
+      </label>
+      <label>Additional N required (kg N/ha)
+        <input id="silageExtraN" type="number" step="0.1">
+        <span class="field-feedback" id="silageExtraNFb"></span>
+      </label>
+      <label>Approx. protected urea + S at 38% N (kg/ha)
+        <input id="silageProduct" type="number" step="1">
+        <span class="field-feedback" id="silageProductFb"></span>
+      </label>
+      <label>Slurry remaining after silage allocation (m³)
+        <input id="slurryFinal" type="number" step="0.1">
+        <span class="field-feedback" id="slurryFinalFb"></span>
+      </label>
+    </div>
+
+    <div id="silageFeedback" class="feedback neutral">
+      On Index 3 soils, Teagasc guidance treats 33 m³/ha good-quality cattle slurry as approximately sufficient for 1st-cut silage P and K; then balance N.
+    </div>
+    <div class="actions"><button id="markLesson5">Mark this attempt</button></div>
+  </section>
+
+  <section class="card hidden" id="lesson6">
+    <p class="stepno">Lesson 6 · Timing first-cut N</p>
+    <h2>When should the silage N be applied?</h2>
+
+    <p>The crop takes up about <strong>2.5 kg N/ha/day</strong>. Apply N at least <strong>6 weeks before cutting</strong>.</p>
+    <div class="question-grid three">
+      <label>Days in 6 weeks
+        <input id="sixWeeksDays" type="number" step="1">
+        <span class="field-feedback" id="sixWeeksDaysFb"></span>
+      </label>
+      <label>N uptake over 40 days (kg N/ha)
+        <input id="uptake40" type="number" step="0.1">
+        <span class="field-feedback" id="uptake40Fb"></span>
+      </label>
+      <label>If cutting 20 May, latest application date (day of May = 8 for 8 April? enter day of April as negative? Use 8)
+        <input id="latestDay" type="number" step="1">
+        <span class="field-feedback" id="latestDayFb"></span>
+      </label>
+    </div>
+
+    <p class="small">For this exercise enter <strong>8</strong> for 8 April (42 days before 20 May).</p>
+    <div id="timingSilageFeedback" class="feedback neutral">Check the six-week interval and uptake rate.</div>
+    <div class="actions"><button id="markLesson6">Mark this attempt</button></div>
+  </section>
+
+  <section class="card hidden" id="summary">
+    <p class="stepno">Farm plan completed</p>
+    <h2>What the student should conclude</h2>
+
+    <div class="summary-list">
+      <p><strong>Lime:</strong> correct the 8 ha acidic block from the soil test, using 6.25 t/ha (50 t total).</p>
+      <p><strong>Sequence:</strong> where early slurry is needed, slurry first, then lime after about 7 days; protected urea does not require a lime interval.</p>
+      <p><strong>Spring grazing:</strong> use the well-drained 40/15/15/30 slurry/protected-urea programme.</p>
+      <p><strong>Slurry:</strong> use measured inventory strategically, prioritising low-cover spring areas and the Index-3 silage block.</p>
+      <p><strong>Silage:</strong> use about 33 m³ slurry/ha and balance remaining N with protected urea + S; apply N at least six weeks before cutting.</p>
+    </div>
+
+    <p class="small">
+      This case is deliberately simplified. Real farm plans must use current soil tests, actual slurry analysis/DM, crop requirements,
+      stocking-rate/legal nutrient allowances, weather/trafficability and current regulations.
+    </p>
+  </section>
+
+  <section class="card source-card">
+    <p class="stepno">Sources used to build this exercise</p>
+    <h2>Teagasc guidance</h2>
+    <p class="small">
+      This training case combines the supplied 2025 Teagasc teaching material with current Teagasc online soil-fertility and liming guidance.
+      Always check the current Teagasc advice and applicable regulations before using a classroom calculation on farm.
+    </p>
+    <ul>
+      <li>Teagasc: Chemical N fertiliser and slurry application guidelines 2025 — well-drained farm.</li>
+      <li>Teagasc: Soil pH / liming and Advice on Liming.</li>
+      <li>Teagasc: Crop management / first-cut grass silage fertilisation.</li>
+    </ul>
+  </section>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>
